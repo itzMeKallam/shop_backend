@@ -6,18 +6,17 @@ const cors = require('cors')
 // import Admin Routers
 const adminSignupRoute = require('./routes/admin/signup')
 const adminSigninRoute = require('./routes/admin/signin')
-// const createRoom = require('./routes/createRoom')
-// const joinRoom = require('./routes/joinRoom')
+const adminAddProducts = require('./routes/admin/addProducts')
 
 // Services
 app.use(bodyParser.json())
-
+bodyParser.urlencoded({ extended: true })
 
 // Routers
 app.use(cors())
 app.use('/admin/signup/', adminSignupRoute)
 app.use('/admin/signin/', adminSigninRoute)
-// app.use('/create', createRoom)
+app.use('/admin/addProducts/', adminAddProducts)
 // app.use('/join', joinRoom)
 
 

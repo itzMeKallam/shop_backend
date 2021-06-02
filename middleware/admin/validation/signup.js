@@ -35,7 +35,8 @@ exports.adminPostSignupMiddleWare=(body)=>{
         }
         return (req.body.password = value)
     }),
-    body('confirmPassword').custom((value, {req})=>{
+    body('confirmPassword')
+    .custom((value, {req})=>{
         if(validator.isEmpty(value)){
             return Promise.reject('Confirm Password is required')
         }

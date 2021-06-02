@@ -1,26 +1,31 @@
 const Users = require('../../../model/admin/users')
 const bcrypt = require('bcryptjs')
+const validator = require('validator')
 exports.adminPostSigninMiddleWare=(body)=>{
     let hashPassword
     return [
-    body('email').isEmail().normalizeEmail().withMessage('Please Enter a valid E-mail')
-    .custom((value, {req}) =>{
-        return Users.findOne({email: value}).then(user=>{
-            if(!user){
-                return Promise.reject('Invalid email')
+        body('email') 
+        .custom((value, {req}) =>{
+            if(!validator.isEmail(value)){ 
+                return Promise.reject('Invalid Email')
             }
-
-            hashPassword = user.password
-        })
-    }),
+            value = value.toLowerCase()
+            return Users.findOne({email: value}).then(user=>{
+                if(!user){
+                    return Promise.reject('Email doesn`t exist')
+                }
+                hashPassword = user.password
+                return (req.body.email = value)
+            })
+        }),
     body('password')
     .custom((value, {req})=>{
-        bcrypt.compare(value, hashPassword).then(matched=>{
+        return bcrypt.compare(value, hashPassword).then(matched=>{
             if(!matched){
                 return Promise.reject('Invalid password')
             }
+            return (req.body.password = value)
         })
-        return true
     })
 ]
 }
