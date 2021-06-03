@@ -8,15 +8,6 @@ exports.adminPostSignup =(req,res, next)=>{
     const email = req.body.email
     const password = req.body.password
     const username = req.body.username 
-    const errors = validationResult(req);
-    let error
-    if (!errors.isEmpty()) {
-        error = new Error('validation failed')
-        error.statusCode = 422
-        error.data = errors.array()
-        throw error
-        
-    }
 
     bcryptjs.hash(password, 12).then(hp=>{
         const user =new Users({

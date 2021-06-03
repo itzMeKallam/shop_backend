@@ -1,16 +1,15 @@
-const { validationResult } = require('express-validator'); 
+const AdminProducts = require('../../model/admin/addProducts')
 
 exports.adminAddProducts =(req,res, next)=>{
-    const errors = validationResult(req);
     
-    let error
-    if (!errors.isEmpty()) {
-        error = new Error('validation failed')
-        error.statusCode = 422
-        error.data = errors.array()
-        throw error  
-    }
-    console.log(req.body)
-    console.log(req.userId)
-    res.status(201).json(req.body)
+    const adminProducts =new AdminProducts({
+        title: req.body.title,
+        description: req.body.description,
+        price: req.body.price,
+        image: './images/book.jpg',
+        createdBy: req.userId
+    })
+    return adminProducts.save().then(product=>{
+        return res.status(201).json({message: 'Product', data: 'Product added'})
+    })
 } 

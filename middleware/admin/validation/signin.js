@@ -1,33 +1,36 @@
 const Users = require('../../../model/admin/users')
 const bcrypt = require('bcryptjs')
 const validator = require('validator')
-exports.adminPostSigninMiddleWare=(body)=>{
-    let hashPassword
-    return [
-        body('email') 
-        .custom((value, {req}) =>{
-            if(!validator.isEmail(value)){ 
-                return Promise.reject('Invalid Email')
-            }
-            value = value.toLowerCase()
-            return Users.findOne({email: value}).then(user=>{
-                if(!user){
-                    return Promise.reject('Email doesn`t exist')
-                }
-                hashPassword = user.password
-                return (req.body.email = value)
-            })
-        }),
-    body('password')
-    .custom((value, {req})=>{
-        return bcrypt.compare(value, hashPassword).then(matched=>{
-            if(!matched){
-                return Promise.reject('Invalid password')
-            }
-            return (req.body.password = value)
-        })
+exports.adminPostSigninMiddleWare=(req, res, next)=>{
+    let email = req.body.email
+    let password = req.body.password
+
+    // Email
+    if(!validator.isEmail(email)){
+        return res.status(422).json({message: 'Validation failed', data: 'Invalid Email'})
+    }
+    email = email.toLowerCase()
+
+    return Users.findOne({email}).then(user=>{
+        if(!user){
+            return res.status(422).json({message: 'Validation failed', data: 'Email Id doesn`t exist'})
+        }
+        return user.password
+    }).then(hashPassword=>{
+        // Passoword
+        return bcrypt.compare(password, hashPassword)
+    }).then(matched=>{
+        if(!matched){
+            return res.status(422).json({message: 'Validation failed', data: 'Wrong Password'})
+        }
+        req.email = email
+        req.password = password
+        return next()
+    }).catch(error=>{
+        return res.status(500).json({message: 'Validation failed', data: 'Unable to reach server'})
     })
-]
+
+   
 }
 
 

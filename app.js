@@ -7,6 +7,7 @@ const cors = require('cors')
 const adminSignupRoute = require('./routes/admin/signup')
 const adminSigninRoute = require('./routes/admin/signin')
 const adminAddProducts = require('./routes/admin/addProducts')
+const adminViewProducts = require('./routes/admin/viewProducts')
 
 // Services
 app.use(bodyParser.json())
@@ -17,16 +18,7 @@ app.use(cors())
 app.use('/admin/signup/', adminSignupRoute)
 app.use('/admin/signin/', adminSigninRoute)
 app.use('/admin/addProducts/', adminAddProducts)
-// app.use('/join', joinRoom)
-
-
-app.use((error, req, res, next)=>{
-  const status = error.statusCode || 500
-  const message = error.message || 'Unable to reach server'
-  const data = error.data
-  res.status(status).json({message: message, data: data})
-})
-
+app.use('/admin/viewProducts/', adminViewProducts)
 
 
 

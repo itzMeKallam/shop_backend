@@ -5,14 +5,6 @@ const jwt = require('jsonwebtoken')
 
 exports.adminPostSignin =(req,res, next)=>{
     const email = req.body.email
-    const errors = validationResult(req);
-    let error
-    if (!errors.isEmpty()) {
-        error = new Error('validation failed')
-        error.statusCode = 422
-        error.data = errors.array()
-        throw error  
-    }
     return Users.findOne({email: email}).then(user=>{
         const token = jwt.sign({
             userId: user._id.toString()

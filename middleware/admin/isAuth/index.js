@@ -4,34 +4,28 @@ const Users = require('../../../model/admin/users')
 module.exports=(req, res, next)=>{
     const authHeader = req.get('Authorization')
     if(!authHeader){
-        const error = new Error('Not Authenticated')
-        error.statusCode = 401
-        throw error
+        return res.status(401).json({message: 'UnAuthorised', data: 'Recognized unauthorized operation, please login again'})
     } 
     const token = authHeader.split(' ')[1]
     let decodedToken
     try{
         decodedToken = jwt.verify(token , 'kocinakovanigamakorisaparevaparaparahey')
     } catch(err){
-        err.data = token
-        err.statusCode = 500
-        throw err
+        return res.status(500).json({message: 'Unhandled error', data: 'Sorry for the inconvinence, please login again'})
     }
 
     if(!decodedToken){
-        const error = new Error('Not Authenticated')
-        error.statusCode = 401
-        throw error
+        return res.status(401).json({message: 'UnAuthorised', data: 'Recognized unauthorized operation, please login again'})
     }
 
     req.userId = decodedToken.userId
     return Users.findById(req.userId).then(user=>{
         if(!user){
-            return Promise.reject('Email address already exist')
+            return res.status(401).json({message: 'UnAuthorised', data: 'Recognized unauthorized operation, please login again'})
         }
         return next()
     }).catch(error=>{
-        return next()
+        return res.status(500).json({message: 'can`t reach server', data: 'Sorry for the inconvinence, please login again'})
     })
     
 }
